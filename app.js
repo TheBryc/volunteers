@@ -1623,6 +1623,25 @@ const PROSPECT_FIELDS = [
   { key: 'customMsg',  label: 'Customizable Message' },
 ];
 
+async function loadSheetConfigFromFirebase() {
+  if (!window._fb) return;
+  const local = getSheetConfig();
+  // If local config already exists with the key fields, don't overwrite
+  if (local.clientId && local.sheetId) return;
+  try {
+    const snap = await window._fb.getDoc(window._fb.SHEETS_DOC);
+    if (snap.exists()) {
+      const remote = snap.data();
+      if (remote.clientId && remote.sheetId) {
+        localStorage.setItem('bryc-sheets-config', JSON.stringify(remote));
+        console.log('Loaded Sheets config from Firebase');
+      }
+    }
+  } catch(e) {
+    console.warn('Could not load Sheets config from Firebase:', e);
+  }
+}
+
 function getSheetConfig() {
   try { return JSON.parse(localStorage.getItem('bryc-sheets-config') || '{}'); } catch(e) { return {}; }
 }

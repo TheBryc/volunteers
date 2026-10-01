@@ -171,7 +171,12 @@ function startApp() {
   populateDropdowns();
   preloadEventDefaults();
   renderAll();
-  loadFromFirebase().then(() => startRealtimeSync());
+  loadFromFirebase().then(() => {
+    loadSheetConfigFromFirebase().then(() => {
+      populateSheetSettings();
+    });
+    startRealtimeSync();
+  });
 }
 
 function doLogout() {
